@@ -4,6 +4,64 @@ Format: `[data] Krótki opis zmiany — pliki których dotyczy`
 
 ---
 
+## 2026-03-26 (9)
+
+### Windows Installer — Inno Setup + release CI workflow
+
+**Problem:**
+Engine uruchamiał się wyłącznie przez `node apps/engine/src/server.js` lub poprzez ręcznie zbudowane `riffrush-engine.exe`. Brakowało instalatora, który mógłby zainstalować silnik na komputerze użytkownika, stworzyć skrót w Start Menu i opcjonalnie uruchamiać silnik przy starcie systemu.
+
+**Rozwiązanie:**
+Inno Setup 6 `.iss` skrypt pakuje engine i opcjonalny native-capture-bridge w standardowy instalator Windows (`.exe`). Release CI workflow buduje instalator automatycznie przy każdym tagu wersji i publikuje go jako GitHub Release.
+
+**Nowe pliki:**
+
+`apps/installer/riffrush.iss` — Inno Setup skrypt:
+- Składowe (komponenty do wyboru podczas instalacji):
+  - **Engine** (wymagany) — `riffrush-engine.exe` → `%ProgramFiles%\RiffRush Engine\`
+  - **Native Capture Bridge** (zalecany) — `native-capture-bridge.exe` (pominięty cicho, jeśli nie zbudowany)
+  - **Auto-start** (opcjonalny) — wpis `HKCU\...\Run` uruchamia silnik przy logowaniu
+- Skrót w Start Menu: "RiffRush Engine"
+- Dezinstalator — usuwa pliki, skrót i klucz rejestru
+- Nie wymaga uprawnień administratora (`PrivilegesRequired=lowest`)
+- Informacja po instalacji: URL serwera `ws://127.0.0.1:3210/ws` i instrukcja obsługi
+
+`.github/workflows/release.yml` — Release workflow (trigger: `git push --tags v*`):
+
+```
+Job: smoke-tests (ubuntu-latest)
+  → wszystkie smoke testy
+
+Job: build-web (ubuntu-latest, needs: smoke-tests)
+  → vite build → artifact: web-dist (30 dni)
+
+Job: build-installer (windows-latest, needs: smoke-tests)
+  → node build-exe.js          # riffrush-engine.exe
+  → node build-exe.js --full   # + native-capture-bridge.exe (continue-on-error)
+  → ISCC /DMyAppVersion=TAG    # RiffRush-Engine-Setup-{version}.exe
+  → artifact: windows-installer (30 dni)
+
+Job: create-release (ubuntu-latest, needs: [build-web, build-installer])
+  → GitHub Release z automatycznymi release notes
+  → assets: RiffRush-Engine-Setup-{version}.exe + web-dist.zip
+```
+
+`package.json` (root) — dodano skrypt:
+```bash
+npm run build:installer   # buduje engine exe i wywołuje ISCC (Windows only)
+```
+
+**Jak wydać nową wersję:**
+```bash
+git tag v0.2.0
+git push origin v0.2.0
+# → CI uruchamia release workflow → GitHub Release pojawia się automatycznie
+```
+
+**Testy:** `smoke:backend` (pass), `smoke:auth` (pass), `smoke:web` (pass), `smoke:vertical` (pass)
+
+---
+
 ## 2026-03-26 (8)
 
 ### Gameplay UI — 6-strunowa autostrada nut (multi-lane highway)

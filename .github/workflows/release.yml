@@ -1,0 +1,129 @@
+name: Release
+
+# Triggered by pushing a version tag, e.g.: git tag v0.2.0 && git push --tags
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  # ── 1. Smoke tests (Linux, fast) ──────────────────────────────────────────
+  smoke-tests:
+    name: Smoke tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run smoke:backend
+      - run: npm run smoke:auth
+      - run: npm run smoke:web
+      - run: npm run smoke:vertical
+
+  # ── 2. Web dist (Linux, fast) ─────────────────────────────────────────────
+  build-web:
+    name: Build web
+    needs: smoke-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build:web
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-dist
+          path: apps/web/dist/
+          retention-days: 30
+
+  # ── 3. Engine installer (Windows) ─────────────────────────────────────────
+  build-installer:
+    name: Build Windows installer
+    needs: smoke-tests
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Build riffrush-engine.exe via Node.js SEA + esbuild + postject.
+      # The script exits non-zero on failure, which aborts the job.
+      - name: Build engine exe
+        run: node apps/engine/scripts/build-exe.js
+
+      # Try to build native-capture-bridge.exe (needs .NET SDK on runner).
+      # We use continue-on-error so a missing dotnet SDK doesn't block the release.
+      - name: Build native capture bridge
+        run: node apps/engine/scripts/build-exe.js --full
+        continue-on-error: true
+
+      # Inno Setup 6 is pre-installed on the windows-latest GitHub runner.
+      # ISCC.exe lives at the path below; we pass the version from the git tag.
+      - name: Build installer
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}" -replace '^v', ''
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" `
+            /DMyAppVersion=$version `
+            apps\installer\riffrush.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: dist/RiffRush-Engine-Setup-*.exe
+          retention-days: 30
+
+  # ── 4. GitHub Release ─────────────────────────────────────────────────────
+  create-release:
+    name: Create GitHub Release
+    needs: [build-web, build-installer]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download web dist
+        uses: actions/download-artifact@v4
+        with:
+          name: web-dist
+          path: release-assets/web-dist/
+
+      - name: Download Windows installer
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-installer
+          path: release-assets/
+
+      # Zip the web dist so it uploads as a single asset.
+      - name: Zip web dist
+        run: |
+          cd release-assets
+          zip -r web-dist.zip web-dist/
+          rm -rf web-dist/
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-assets/**
+          generate_release_notes: true
+          fail_on_unmatched_files: false

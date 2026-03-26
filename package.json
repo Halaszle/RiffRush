@@ -27,6 +27,7 @@
     "build:native-capture": "dotnet build ./apps/native-capture-bridge/native-capture-bridge.csproj",
     "list:native-devices": "dotnet run --project ./apps/native-capture-bridge -- --list-devices",
     "build:engine-exe": "node ./apps/engine/scripts/build-exe.js",
-    "build:engine-exe:full": "node ./apps/engine/scripts/build-exe.js --full"
+    "build:engine-exe:full": "node ./apps/engine/scripts/build-exe.js --full",
+    "build:installer": "node ./apps/engine/scripts/build-exe.js && ISCC /DMyAppVersion=0.1.0 apps\\installer\\riffrush.iss"
   }
 }
