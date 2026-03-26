@@ -487,7 +487,8 @@ export function createEngineServer(
   const server = createServer((request, response) => {
     if (request.method === "GET" && request.url === "/health") {
       response.writeHead(200, {
-        "Content-Type": "application/json; charset=utf-8"
+        "Content-Type": "application/json; charset=utf-8",
+        "Access-Control-Allow-Origin": "*"
       });
       response.end(
         JSON.stringify(
