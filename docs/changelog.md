@@ -4,6 +4,34 @@ Format: `[data] Krótki opis zmiany — pliki których dotyczy`
 
 ---
 
+## 2026-03-26 (10)
+
+### Gameplay — wskaźnik aktualnej nuty w czasie rzeczywistym (`audio.tick`)
+
+**Problem:**
+Gracz podczas sesji treningowej nie wiedział, jaką nutę aktualnie wykrywa silnik — jedynym feedbackiem były zdarzenia `score.event` (trafienie/pudło), które nie pojawiają się w ciągły sposób między targetami.
+
+**Rozwiązanie:**
+Silnik emituje co 4 klatki audio (~200 ms przy 48 kHz / 2048 próbek) wiadomość `audio.tick` z aktualnie wykrytą nutą, częstotliwością i poziomem RMS. UI wyświetla tę nutę jako pływający znacznik po prawej stronie autostrady.
+
+**Szczegóły implementacji:**
+
+- `apps/engine/src/audio/session-analyzer.js` — nowa zmienna `tickFrameCount`; co 4. wywołanie `processSamples` emitowany jest `audio.tick` z polami `{ sessionId, note, frequency, rms }`
+- `apps/web/public/index.html` — dodano `#gameplay-live-note` wewnątrz `#gameplay-highway` (z `aria-live="polite"`)
+- `apps/web/public/styles.css` — `.gameplay-live-note` z CSS custom property `--live-hue` — kolor wskaźnika odpowiada kolorowi struny, z której pochodzi dźwięk (`NOTE_LIVE_HUES`); klasa `.has-note` aktywuje kolor i text-shadow
+- `apps/web/public/app.js`:
+  - `NOTE_LIVE_HUES` — mapowanie nut na barwę HSL zgodną z kolorami torów
+  - `handleAudioTick({ note, rms })` — aktualizuje wskaźnik lub ukrywa go po 400 ms ciszy (debounce `liveNoteTimer`)
+  - Handler `audio.tick` w gałęzi WebSocket message dispatcher
+  - Cleanup `liveNoteTimer` w `closeGameplayOverlay()`
+
+**Wygląd:**
+Zaokrąglony badge po prawej stronie autostrady, tło półprzeźroczyste, kolor tekstu i obramowania w barwie HSL struny. Znika 400 ms po ustaniu sygnału.
+
+**Testy:** `smoke:backend` (pass), `smoke:auth` (pass), `smoke:web` (pass), `smoke:vertical` (pass), `test:engine-audio` (pass), `build:web` (351 ms, 42 kB gzip)
+
+---
+
 ## 2026-03-26 (9)
 
 ### Windows Installer — Inno Setup + release CI workflow

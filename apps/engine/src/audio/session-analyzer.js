@@ -913,6 +913,7 @@ export function createSessionAnalyzer({
     skipped: false
   }));
   let previousRms = 0;
+  let tickFrameCount = 0;
   let totalScore = 0;
   let notesDetected = 0;
   let notesHit = 0;
@@ -1443,6 +1444,20 @@ export function createSessionAnalyzer({
       flushPendingTargetEvaluations(currentFrameEndMs);
       flushMissedTargets(currentFrameTimestampMs);
       finalizeCompletedRepetitions(currentFrameEndMs);
+
+      // Emit a lightweight audio.tick every 4 frames (~200 ms at 48 kHz / 2048)
+      // so the web UI can show a live note indicator without flooding the socket.
+      tickFrameCount += 1;
+      if (tickFrameCount % 4 === 0) {
+        send(
+          createEnvelope("audio.tick", {
+            sessionId,
+            note: analysis.note ?? null,
+            frequency: analysis.frequency > 0 ? Math.round(analysis.frequency) : 0,
+            rms: Number(analysis.rms.toFixed(4))
+          })
+        );
+      }
 
       if (adaptiveStopRequested) {
         return;

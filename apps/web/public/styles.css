@@ -2128,6 +2128,44 @@ body {
   color: #f07070;
 }
 
+/* ── Live note indicator ── */
+
+/* Floats above the right edge of the highway, vertically centred.
+   Shows the note currently detected by the engine (audio.tick messages).
+   Hidden when no signal; fades out via opacity transition. */
+.gameplay-live-note {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 4;
+  min-width: 42px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(4px);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.92);
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.gameplay-live-note[hidden] {
+  display: none;
+}
+
+/* When a note is actively ringing the label picks up the string hue. */
+.gameplay-live-note.has-note {
+  color: hsl(var(--live-hue, 40), 85%, 72%);
+  border-color: hsla(var(--live-hue, 40), 60%, 55%, 0.4);
+  text-shadow: 0 0 8px hsla(var(--live-hue, 40), 80%, 60%, 0.45);
+}
+
 /* ── Results panel ── */
 
 .gameplay-results {

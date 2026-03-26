@@ -18,6 +18,7 @@ const state = {
     missCount: 0,
     comboMultiplier: 1,
     feedbackTimer: null,
+    liveNoteTimer: null,
     rafId: null
   },
   onboarding: {
@@ -196,6 +197,7 @@ const elements = {
   gameplayResultsAccuracy: document.querySelector("#gameplay-results-accuracy"),
   gameplayResultsFeedback: document.querySelector("#gameplay-results-feedback"),
   gameplayResultsContinue: document.querySelector("#gameplay-results-continue"),
+  gameplayLiveNote: document.querySelector("#gameplay-live-note"),
   onboardingOverlay: document.querySelector("#onboarding-overlay"),
   onboardingStep1: document.querySelector("#onboarding-step-1"),
   onboardingStep2: document.querySelector("#onboarding-step-2"),
@@ -4779,9 +4781,10 @@ function openGameplayOverlay(training, sessionStartedPayload) {
     elements.gameplayNotes.appendChild(el);
   }
 
-  // Hide results, show countdown
+  // Hide results, show countdown, reset live note indicator
   elements.gameplayResults.hidden = true;
   elements.gameplayFeedback.hidden = true;
+  if (elements.gameplayLiveNote) elements.gameplayLiveNote.hidden = true;
   elements.gameplayCountdown.hidden = false;
   elements.gameplayCountdown.textContent = "Get Ready";
 
@@ -4885,6 +4888,53 @@ function showGameplayFeedback(eventKind, timingClass, hit) {
   }, 600);
 }
 
+// Map note names to the string hue that best represents them on the highway.
+// Approximate — the detector may assign slightly different strings, but this
+// gives the indicator a meaningful colour even when the string isn't known.
+const NOTE_LIVE_HUES = {
+  E2: 0, F2: 0, "F#2": 0, G2: 0, "G#2": 0,        // string 6
+  A2: 22, "A#2": 22, B2: 22, C3: 22, "C#3": 22,    // string 5
+  D3: 130, "D#3": 130, E3: 130, F3: 130, "F#3": 130, G3: 130, "G#3": 130, // string 4
+  A3: 195, "A#3": 195, B3: 195, C4: 195,            // string 3
+  "C#4": 280, D4: 280, "D#4": 280, E4: 280, F4: 280, "F#4": 280, G4: 280, "G#4": 280, // string 2
+  A4: 52, "A#4": 52, B4: 52, C5: 52, "C#5": 52, D5: 52, "D#5": 52, E5: 52 // string 1
+};
+
+/**
+ * Handles engine `audio.tick` messages during gameplay.
+ * Updates the live note indicator with the currently detected pitch.
+ * Hides the indicator after a short silence (400 ms).
+ */
+function handleAudioTick({ note, rms }) {
+  if (!state.gameplay.active) return;
+
+  const el = elements.gameplayLiveNote;
+  if (!el) return;
+
+  const SILENCE_THRESHOLD = 0.015;
+
+  if (note && rms > SILENCE_THRESHOLD) {
+    const hue = NOTE_LIVE_HUES[note];
+    el.textContent = note;
+    el.className = "gameplay-live-note has-note";
+    if (hue !== undefined) {
+      el.style.setProperty("--live-hue", hue);
+    } else {
+      el.style.removeProperty("--live-hue");
+    }
+    el.hidden = false;
+  }
+
+  // Schedule hide after silence — reset on every tick that has signal
+  if (state.gameplay.liveNoteTimer) {
+    clearTimeout(state.gameplay.liveNoteTimer);
+  }
+  state.gameplay.liveNoteTimer = setTimeout(() => {
+    if (el) el.hidden = true;
+    state.gameplay.liveNoteTimer = null;
+  }, 400);
+}
+
 /** Shows the results panel when session.summary arrives. */
 function onGameplaySessionSummary(summaryPayload) {
   if (!state.gameplay.active) return;
@@ -4918,11 +4968,17 @@ function closeGameplayOverlay() {
     state.gameplay.feedbackTimer = null;
   }
 
+  if (state.gameplay.liveNoteTimer) {
+    clearTimeout(state.gameplay.liveNoteTimer);
+    state.gameplay.liveNoteTimer = null;
+  }
+
   elements.gameplayOverlay.hidden = true;
   elements.gameplayNotes.innerHTML = "";
   elements.gameplayResults.hidden = true;
   elements.gameplayCountdown.hidden = true;
   elements.gameplayFeedback.hidden = true;
+  if (elements.gameplayLiveNote) elements.gameplayLiveNote.hidden = true;
 }
 
 function createDiagnosticsFilterQuery() {
@@ -7831,6 +7887,11 @@ async function connectEngine() {
         updateActionButtons();
         setStatus(elements.summaryStatus, "error", `Engine finished session, but backend save failed: ${error.message}`);
       }
+      return;
+    }
+
+    if (message.type === "audio.tick") {
+      handleAudioTick(message.payload);
       return;
     }
 
