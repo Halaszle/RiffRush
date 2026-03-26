@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RiffRush MVP Shell</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <div class="background-orb orb-one"></div>
+    <div class="background-orb orb-two"></div>
+
+    <div id="auth-panel" class="auth-overlay" hidden>
+      <div class="auth-card">
+        <p class="eyebrow">RiffRush</p>
+        <h1 class="auth-title">Sign in to continue</h1>
+
+        <div id="auth-tabs" class="auth-tabs">
+          <button id="auth-tab-login" class="auth-tab auth-tab-active" type="button">Log in</button>
+          <button id="auth-tab-register" class="auth-tab" type="button">Register</button>
+        </div>
+
+        <form id="auth-form-login" class="auth-form" novalidate>
+          <label class="auth-field">
+            <span>Email</span>
+            <input id="auth-login-email" class="text-input" type="email" autocomplete="email" placeholder="guitarist@example.com" required>
+          </label>
+          <label class="auth-field">
+            <span>Password</span>
+            <input id="auth-login-password" class="text-input" type="password" autocomplete="current-password" placeholder="••••••••" required>
+          </label>
+          <div id="auth-login-error" class="auth-error" hidden></div>
+          <button class="button button-primary auth-submit" type="submit">Log in</button>
+        </form>
+
+        <form id="auth-form-register" class="auth-form" hidden novalidate>
+          <label class="auth-field">
+            <span>Email</span>
+            <input id="auth-register-email" class="text-input" type="email" autocomplete="email" placeholder="guitarist@example.com" required>
+          </label>
+          <label class="auth-field">
+            <span>Password</span>
+            <input id="auth-register-password" class="text-input" type="password" autocomplete="new-password" placeholder="Min. 8 characters" required>
+          </label>
+          <div id="auth-register-error" class="auth-error" hidden></div>
+          <button class="button button-primary auth-submit" type="submit">Create account</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="onboarding-overlay" class="onboarding-overlay" hidden>
+      <div class="onboarding-card">
+        <div class="onboarding-steps-indicator">
+          <span id="onboarding-dot-1" class="onboarding-dot onboarding-dot-active"></span>
+          <span id="onboarding-dot-2" class="onboarding-dot"></span>
+          <span id="onboarding-dot-3" class="onboarding-dot"></span>
+        </div>
+
+        <div id="onboarding-step-1" class="onboarding-step">
+          <p class="eyebrow">Step 1 of 3</p>
+          <h2 class="onboarding-title">Welcome to RiffRush</h2>
+          <p class="onboarding-copy">Practice guitar with real-time pitch detection and instant feedback. Each exercise tracks your accuracy, builds your technique, and adapts as you improve.</p>
+          <button id="onboarding-next-1" class="button button-primary onboarding-cta" type="button">Get started →</button>
+        </div>
+
+        <div id="onboarding-step-2" class="onboarding-step" hidden>
+          <p class="eyebrow">Step 2 of 3</p>
+          <h2 class="onboarding-title">Start the engine</h2>
+          <p class="onboarding-copy">RiffRush uses a local audio engine to process your guitar input. Launch <code>riffrush-engine.exe</code> on your machine, then wait for the connection below.</p>
+          <div class="onboarding-engine-status">
+            <span id="onboarding-status-dot" class="onboarding-status-dot onboarding-status-checking"></span>
+            <span id="onboarding-engine-status-text">Checking for engine…</span>
+          </div>
+          <button id="onboarding-next-2" class="button button-primary onboarding-cta" type="button" disabled>Continue</button>
+          <button id="onboarding-skip-engine" class="button button-secondary onboarding-skip" type="button">Skip for now</button>
+        </div>
+
+        <div id="onboarding-step-3" class="onboarding-step" hidden>
+          <p class="eyebrow">Step 3 of 3</p>
+          <h2 class="onboarding-title">You're all set!</h2>
+          <p class="onboarding-copy">Load the training catalog, pick an exercise, and start your first session. The engine captures your guitar input and scores your performance in real time.</p>
+          <button id="onboarding-finish" class="button button-primary onboarding-cta" type="button">Start playing</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="gameplay-overlay" class="gameplay-overlay" hidden>
+      <header class="gameplay-header">
+        <div class="gameplay-meta">
+          <span id="gameplay-training-name" class="gameplay-training-name"></span>
+          <span id="gameplay-tempo-label" class="gameplay-tempo-label"></span>
+        </div>
+        <div class="gameplay-scores">
+          <div class="gameplay-score-block">
+            <span class="gameplay-score-label">Score</span>
+            <span id="gameplay-score" class="gameplay-score-value">0</span>
+          </div>
+          <div class="gameplay-score-block">
+            <span class="gameplay-score-label">Combo</span>
+            <span id="gameplay-combo" class="gameplay-score-value">×1</span>
+          </div>
+          <div class="gameplay-score-block">
+            <span class="gameplay-score-label">Accuracy</span>
+            <span id="gameplay-accuracy" class="gameplay-score-value">—</span>
+          </div>
+        </div>
+        <button id="gameplay-stop" class="button button-secondary button-small" type="button">Stop session</button>
+      </header>
+
+      <div class="gameplay-stage">
+        <div id="gameplay-countdown" class="gameplay-countdown" hidden></div>
+        <div id="gameplay-feedback" class="gameplay-feedback" hidden></div>
+
+        <div class="gameplay-highway-wrap">
+          <div id="gameplay-highway" class="gameplay-highway">
+            <div class="gameplay-playhead"></div>
+            <div id="gameplay-notes" class="gameplay-notes"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="gameplay-results" class="gameplay-results" hidden>
+        <div class="gameplay-results-card">
+          <div id="gameplay-results-grade" class="gameplay-results-grade">—</div>
+          <div id="gameplay-results-score" class="gameplay-results-score">0</div>
+          <div id="gameplay-results-accuracy" class="gameplay-results-accuracy">—</div>
+          <p id="gameplay-results-feedback" class="gameplay-results-feedback"></p>
+          <button id="gameplay-results-continue" class="button button-primary" type="button">Continue</button>
+        </div>
+      </div>
+    </div>
+
+    <main id="app-content" class="layout">
+      <section class="hero">
+        <p class="eyebrow">RiffRush MVP Shell</p>
+        <h1>Thin frontend for the first playable training flow.</h1>
+        <p class="lead">
+          This screen is not the final product UI. It is a clean shell for validating the first
+          vertical slice from web to backend before the local audio engine is wired in.
+        </p>
+      </section>
+
+      <section class="panel connection-panel">
+        <div id="user-bar" class="user-bar" hidden>
+          <span id="user-bar-email" class="user-bar-email"></span>
+          <button id="logout-button" class="button button-secondary button-small" type="button">Log out</button>
+        </div>
+
+        <div class="connection-grid">
+          <div>
+            <p class="panel-label">Backend endpoint</p>
+            <input id="backend-url" class="text-input" value="http://127.0.0.1:3001">
+          </div>
+
+          <div>
+            <p class="panel-label">Engine WebSocket</p>
+            <input id="engine-url" class="text-input" value="ws://127.0.0.1:3210/ws">
+          </div>
+        </div>
+
+        <div class="button-row">
+          <button id="check-health" class="button button-primary">Check health</button>
+          <button id="load-trainings" class="button button-secondary">Load trainings</button>
+          <button id="load-dashboard" class="button button-secondary">Load dashboard</button>
+          <button id="connect-engine" class="button button-secondary">Connect engine</button>
+          <button id="load-native-devices" class="button button-secondary" disabled>Load input devices</button>
+          <button id="disconnect-engine" class="button button-secondary" disabled>Disconnect engine</button>
+        </div>
+
+        <div id="health-status" class="status-card">Waiting for backend check.</div>
+        <div id="engine-status" class="status-card">Engine is not connected.</div>
+      </section>
+
+      <section class="panel calibration-grid">
+        <article class="session-card">
+          <p class="panel-label">Onboarding</p>
+          <h2>Calibration</h2>
+          <p class="panel-copy">
+            Run calibration before the first training. The current engine returns a deterministic mock
+            result, but the full flow is already wired end to end.
+          </p>
+          <button id="start-calibration" class="button button-primary" disabled>Start calibration</button>
+          <div id="calibration-status" class="status-card">Calibration has not started yet.</div>
+        </article>
+
+        <article class="session-card">
+          <p class="panel-label">User progress</p>
+          <h2>Dashboard snapshot</h2>
+          <div id="dashboard-summary" class="dashboard-summary">
+            <article class="dashboard-card">
+              <strong>Completed sessions</strong>
+              <span>0</span>
+            </article>
+            <article class="dashboard-card">
+              <strong>Total score</strong>
+              <span>0</span>
+            </article>
+            <article class="dashboard-card">
+              <strong>Average accuracy</strong>
+              <span>0</span>
+            </article>
+            <article class="dashboard-card">
+              <strong>Streak days</strong>
+              <span>0</span>
+            </article>
+          </div>
+          <div>
+            <p class="panel-label">Targeted practice</p>
+            <div id="dashboard-targeted-practice" class="status-card">
+              No targeted practice recommendation yet.
+            </div>
+          </div>
+          <div id="dashboard-results" class="event-log">
+            <article class="event-log-empty">No completed sessions yet.</article>
+          </div>
+          <div class="diagnostics-stack">
+            <div>
+              <p class="panel-label">Capture preferences</p>
+              <div id="dashboard-capture-preferences" class="status-card">
+                No capture preferences loaded yet.
+              </div>
+            </div>
+            <div>
+              <p class="panel-label">Recent capture overrides</p>
+              <div id="dashboard-capture-overrides" class="event-log diagnostics-log">
+                <article class="event-log-empty">No capture overrides recorded yet.</article>
+              </div>
+            </div>
+            <div>
+              <p class="panel-label">Setup recommendation feedback</p>
+              <div id="dashboard-setup-recommendations" class="event-log diagnostics-log">
+                <article class="event-log-empty">No setup recommendation feedback recorded yet.</article>
+              </div>
+              <div id="setup-recommendation-feedback-status" class="status-card">
+                Setup recommendation feedback has not been recorded yet.
+              </div>
+            </div>
+          </div>
+          <div class="diagnostics-stack">
+            <div>
+              <p class="panel-label">Technical comparison</p>
+              <div class="form-grid diagnostics-filter-grid">
+                <label>
+                  <span>Device filter</span>
+                  <input id="diagnostics-device-filter" class="text-input" placeholder="Focusrite">
+                </label>
+                <label>
+                  <span>Backend filter</span>
+                  <select id="diagnostics-backend-filter" class="text-input">
+                    <option value="">All backends</option>
+                    <option value="wavein">WaveIn</option>
+                    <option value="wasapi">WASAPI</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Profile filter</span>
+                  <select id="diagnostics-profile-filter" class="text-input">
+                    <option value="">All profiles</option>
+                    <option value="safe">Safe</option>
+                    <option value="balanced">Balanced</option>
+                    <option value="low-latency">Low latency</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Sort paths</span>
+                  <select id="diagnostics-sort-by" class="text-input">
+                    <option value="latest">Latest activity</option>
+                    <option value="fallbacks">Fallback count</option>
+                    <option value="fallbackRate">Fallback rate</option>
+                    <option value="attempts">Average start attempts</option>
+                    <option value="sessions">Session count</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Sort direction</span>
+                  <select id="diagnostics-sort-direction" class="text-input">
+                    <option value="desc">Descending</option>
+                    <option value="asc">Ascending</option>
+                  </select>
+                </label>
+              </div>
+              <div class="button-row">
+                <button id="apply-diagnostics-filters" class="button button-secondary">Apply filters</button>
+                <button id="clear-diagnostics-filters" class="button button-secondary">Clear filters</button>
+                <button id="export-diagnostics-json" class="button button-secondary">Export JSON</button>
+                <button id="export-diagnostics-csv" class="button button-secondary">Export CSV</button>
+              </div>
+              <div id="diagnostics-export-status" class="status-card">Diagnostics export has not started yet.</div>
+              <div id="diagnostics-summary-cards" class="diagnostics-grid diagnostics-summary-grid">
+                <article class="diagnostics-metric">
+                  <strong>Sessions</strong>
+                  <span>0</span>
+                </article>
+                <article class="diagnostics-metric">
+                  <strong>Fallback rate</strong>
+                  <span>0%</span>
+                </article>
+                <article class="diagnostics-metric">
+                  <strong>Average attempts</strong>
+                  <span>0</span>
+                </article>
+                <article class="diagnostics-metric">
+                  <strong>Most problematic path</strong>
+                  <span>Load dashboard to inspect capture diagnostics.</span>
+                </article>
+              </div>
+              <div class="diagnostics-grid diagnostics-summary-grid">
+                <div id="diagnostics-recommendation" class="status-card diagnostics-card">
+                  Recommended capture path will appear after loading the diagnostics report.
+                </div>
+                <div id="diagnostics-ranking" class="event-log diagnostics-log">
+                  <article class="event-log-empty">No problematic paths ranked yet.</article>
+                </div>
+              </div>
+              <div>
+                <p class="panel-label">Runtime issue breakdown</p>
+                <div id="diagnostics-runtime-issues" class="event-log diagnostics-log">
+                  <article class="event-log-empty">No runtime issue breakdown available yet.</article>
+                </div>
+              </div>
+              <div>
+                <p class="panel-label">Per-device recommendations</p>
+                <div id="diagnostics-device-recommendations" class="event-log diagnostics-log">
+                  <article class="event-log-empty">No per-device recommendations yet.</article>
+                </div>
+              </div>
+              <div>
+                <p class="panel-label">Selected device diagnostics</p>
+                <div class="button-row">
+                  <select id="diagnostics-device-detail-select" class="text-input">
+                    <option value="">No device selected</option>
+                  </select>
+                  <button id="load-device-diagnostics" class="button button-secondary">Load device detail</button>
+                </div>
+                <div id="diagnostics-device-detail" class="event-log diagnostics-log">
+                  <article class="event-log-empty">No device diagnostics loaded yet.</article>
+                </div>
+              </div>
+              <div id="diagnostics-groups" class="event-log">
+                <article class="event-log-empty">No diagnostics report loaded yet.</article>
+              </div>
+            </div>
+            <div>
+              <p class="panel-label">Recent technical sessions</p>
+              <div id="diagnostics-sessions" class="event-log">
+                <article class="event-log-empty">No diagnostics report loaded yet.</article>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <p class="panel-label">Training catalog</p>
+            <h2>Available MVP trainings</h2>
+          </div>
+          <span id="training-count" class="badge">0 items</span>
+        </div>
+
+        <div id="training-list" class="training-list">
+          <article class="training-card training-card-empty">
+            <p>Load trainings to see the current catalog.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel session-grid">
+        <article class="session-card">
+          <p class="panel-label">Session creation</p>
+          <h2>Create a training session</h2>
+          <div class="form-grid">
+            <label>
+              <span>User id</span>
+              <input id="user-id" class="text-input" value="user-001">
+            </label>
+            <label>
+              <span>Calibration offset ms</span>
+              <input id="calibration-offset" class="text-input" type="number" value="12">
+            </label>
+            <label>
+              <span>Input mode</span>
+              <select id="input-mode" class="text-input">
+                <option value="synthetic" selected>Synthetic</option>
+                <option value="wav-file">WAV file</option>
+                <option value="live-stream">Live stream</option>
+                <option value="native-capture">Native capture</option>
+              </select>
+            </label>
+            <label>
+              <span>WAV file path</span>
+              <input id="input-file-path" class="text-input" placeholder="D:\\path\\to\\session.wav">
+            </label>
+            <label>
+              <span>Capture duration ms</span>
+              <input id="capture-duration-ms" class="text-input" type="number" value="4000">
+            </label>
+            <label>
+              <span>Session tempo BPM</span>
+              <input id="session-tempo-bpm" class="text-input" type="number" value="80">
+            </label>
+            <label>
+              <span>Practice scope</span>
+              <select id="practice-scope" class="text-input">
+                <option value="full-chart" selected>Whole chart</option>
+                <option value="section-loop">Section loop</option>
+              </select>
+            </label>
+            <label>
+              <span>Loop section</span>
+              <select id="loop-section-id" class="text-input" disabled>
+                <option value="">Select section</option>
+              </select>
+            </label>
+            <label>
+              <span>Loop repetitions</span>
+              <input id="loop-repetition-count" class="text-input" type="number" value="1" min="1" max="6" disabled>
+            </label>
+            <label>
+              <span>Tempo step BPM</span>
+              <input id="loop-tempo-step-bpm" class="text-input" type="number" value="0" min="0" max="16" disabled>
+            </label>
+            <label>
+              <span>Capture profile</span>
+              <select id="capture-profile" class="text-input">
+                <option value="safe">Safe</option>
+                <option value="balanced" selected>Balanced</option>
+                <option value="low-latency">Low latency</option>
+              </select>
+            </label>
+            <label>
+              <span>Native backend</span>
+              <select id="native-backend" class="text-input">
+                <option value="wavein">WaveIn</option>
+                <option value="wasapi">WASAPI</option>
+              </select>
+            </label>
+            <label>
+              <span>Native input device</span>
+              <select id="input-device-number" class="text-input">
+                <option value="0">Device 0</option>
+              </select>
+            </label>
+          </div>
+          <div class="button-row">
+            <label class="inline-toggle">
+              <input id="auto-apply-capture-recommendation" type="checkbox" checked>
+              <span>Auto-apply recommended capture path on session start</span>
+            </label>
+          </div>
+          <div class="button-row">
+            <button id="apply-practice-preset" class="button button-secondary">Apply practice preset</button>
+            <button id="apply-capture-recommendation" class="button button-secondary">Apply recommendation</button>
+            <button id="run-native-preflight" class="button button-secondary" disabled>Run native preflight</button>
+          </div>
+          <div id="capture-recommendation-status" class="status-card">
+            Load dashboard data to unlock recommended capture paths.
+          </div>
+          <div id="native-preflight-status" class="status-card">Native preflight has not run yet.</div>
+          <button id="create-session" class="button button-primary" disabled>Create session and start engine</button>
+          <button id="stop-live-session" class="button button-secondary" disabled>Stop live session</button>
+          <div id="session-status" class="status-card">No active session.</div>
+        </article>
+
+          <article class="session-card">
+            <p class="panel-label">Live engine feed</p>
+            <h2>Session telemetry</h2>
+            <div class="progression-desktop-layout">
+              <div class="progression-overview-column">
+                <div id="summary-status" class="status-card">Waiting for an active session.</div>
+                <div id="unlock-celebration-status" class="status-card">No newly unlocked training yet.</div>
+                <button id="select-unlocked-training" class="button button-secondary" disabled>Select unlocked training and prefill session</button>
+                <button id="start-unlocked-training" class="button button-primary" disabled>Start unlocked training now</button>
+                <div id="unlock-onboarding-status" class="status-card">Unlock onboarding will appear after the next newly unlocked training.</div>
+                <div id="session-completion-recap" class="status-card">Session completion recap will appear after the next finished session.</div>
+                <div id="dominant-confidence-recap-status" class="status-card">Dominant confidence signal will appear after the next finished session.</div>
+                <div id="progression-checkpoint-recaps" class="checkpoint-recap-grid">
+                  <article class="checkpoint-recap-card checkpoint-recap-empty">
+                    <strong>Checkpoint recap</strong>
+                    <p>Checkpoint recap cards will appear after the next finished session.</p>
+                  </article>
+                </div>
+                <div id="checkpoint-path-summary-cards" class="checkpoint-path-summary-grid">
+                  <article class="checkpoint-recap-card checkpoint-recap-empty">
+                    <strong>Checkpoint path summary</strong>
+                    <p>Checkpoint path summary cards will appear after the next finished sessions.</p>
+                  </article>
+                </div>
+                <div id="checkpoint-path-handoff-status" class="status-card">Checkpoint path handoff will appear after the next successful path action.</div>
+                <button id="checkpoint-path-collapse-toggle" class="button button-secondary" disabled>Show all checkpoint paths</button>
+              </div>
+              <div class="progression-workbench-column">
+                <div class="progression-history-column">
+                  <div class="progression-column-head">
+                    <p class="panel-label">Checkpoint workspace</p>
+                    <h3>History and timeline</h3>
+                  </div>
+                  <div class="button-row">
+                    <label class="history-filter">
+                      <span>Checkpoint history filter</span>
+                      <select id="progression-checkpoint-filter" class="text-input">
+                        <option value="all">All checkpoints</option>
+                        <option value="unlock">Unlock</option>
+                        <option value="recovery">Recovery</option>
+                        <option value="return">Return</option>
+                        <option value="promotion">Promotion</option>
+                        <option value="mastery">Mastery</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div id="progression-checkpoint-history" class="event-log diagnostics-log">
+                    <article class="event-log-empty">Checkpoint history snapshots will appear after the next finished sessions.</article>
+                  </div>
+                  <div id="progression-timeline" class="event-log diagnostics-log">
+                    <article class="event-log-empty">Progression timeline will appear after the next finished session.</article>
+                  </div>
+                </div>
+                <div class="progression-action-column">
+                  <div class="progression-column-head">
+                    <p class="panel-label">Action rail</p>
+                    <h3>Detail and next step</h3>
+                  </div>
+                  <div class="progression-rail-section progression-rail-detail">
+                    <p class="panel-label">Current checkpoint</p>
+                    <div id="progression-checkpoint-detail-badges" class="checkpoint-detail-badges"></div>
+                    <div id="progression-checkpoint-detail" class="status-card">Checkpoint detail will appear after you select a history snapshot.</div>
+                  </div>
+                  <div class="progression-rail-section progression-rail-next-step">
+                    <p class="panel-label">Guided next step</p>
+                    <div class="progression-next-step-stack">
+                      <div id="progression-next-step-decision" class="progression-next-step-decision">
+                        <p class="panel-label">What now</p>
+                        <p id="progression-next-action-state" class="progression-next-action-state">Execution state will appear after the next finished session.</p>
+                        <div id="progression-next-action-status" class="status-card">Checkpoint-driven next action will appear after the next finished session.</div>
+                        <div class="progression-next-step-cta">
+                          <button id="progression-next-action" class="button button-primary" disabled>Follow checkpoint action</button>
+                          <p id="progression-next-action-hint" class="progression-next-action-hint">Action execution hint will appear after the next finished session.</p>
+                          <div class="progression-next-action-feedback-stack">
+                            <div class="progression-next-action-feedback-item progression-next-action-feedback-result">
+                              <p class="progression-next-action-feedback-label">What happened</p>
+                              <div id="progression-next-action-feedback-badge-row" class="badge-row progression-next-action-feedback-badge-row"></div>
+                              <p id="progression-next-action-result" class="progression-next-action-result">Waiting for guided action result.</p>
+                            </div>
+                            <div class="progression-next-action-feedback-item progression-next-action-feedback-focus">
+                              <p class="progression-next-action-feedback-label">Where now</p>
+                              <div id="progression-next-action-focus-badge-row" class="badge-row progression-next-action-feedback-badge-row"></div>
+                              <p id="progression-next-action-focus" class="progression-next-action-focus">Waiting for next focus.</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="progression-next-step-rationale">
+                        <p class="panel-label">Why now</p>
+                        <div id="dominant-confidence-next-action-status" class="status-card">Dominant confidence signal will guide the next action after the next finished session.</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="diagnostics-stack">
+              <div>
+                <p class="panel-label">Capture diagnostics</p>
+              <div id="session-diagnostics-current" class="status-card diagnostics-card">
+                Session diagnostics will appear here after the next session starts.
+              </div>
+            </div>
+            <div>
+              <p class="panel-label">Capture notice history</p>
+              <div id="session-diagnostics-history" class="event-log diagnostics-log">
+                <article class="event-log-empty">No capture notices yet.</article>
+              </div>
+            </div>
+          </div>
+          <div id="event-log" class="event-log">
+            <article class="event-log-empty">No score events yet.</article>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

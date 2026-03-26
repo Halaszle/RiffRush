@@ -1,0 +1,12 @@
+{
+  "name": "@riffrush/engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node ./src/server.js",
+    "smoke": "node ./scripts/smoke-test.js",
+    "build:exe": "node ./scripts/build-exe.js",
+    "build:exe:full": "node ./scripts/build-exe.js --full"
+  }
+}

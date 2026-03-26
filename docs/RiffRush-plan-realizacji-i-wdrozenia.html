@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <title>RiffRush - szczegolowy plan realizacji i wdrozenia</title>
+  <style>
+    :root {
+      --bg: #f6f0e8;
+      --paper: #fffdf8;
+      --ink: #1f1c18;
+      --muted: #5f584f;
+      --accent: #8b4a1f;
+      --accent-soft: #ead7c5;
+      --line: #d9ccbc;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    @page {
+      size: A4;
+      margin: 18mm 16mm 18mm 16mm;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #efe4d5 0%, var(--bg) 100%);
+      color: var(--ink);
+      font-family: "Segoe UI", "Trebuchet MS", Arial, sans-serif;
+      line-height: 1.45;
+    }
+
+    main {
+      width: 210mm;
+      margin: 0 auto;
+      padding: 14mm 0 20mm;
+    }
+
+    .page {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: 0 14px 36px rgba(40, 24, 12, 0.08);
+      padding: 16mm;
+      margin-bottom: 10mm;
+      break-after: page;
+    }
+
+    .page:last-child {
+      break-after: auto;
+    }
+
+    h1, h2, h3 {
+      margin: 0 0 10px;
+      line-height: 1.15;
+    }
+
+    h1 {
+      font-size: 30px;
+      letter-spacing: 0.02em;
+    }
+
+    h2 {
+      font-size: 22px;
+      margin-top: 22px;
+      padding-top: 8px;
+      border-top: 2px solid var(--accent-soft);
+    }
+
+    h3 {
+      font-size: 16px;
+      margin-top: 16px;
+      color: var(--accent);
+    }
+
+    p {
+      margin: 0 0 12px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 16px;
+      padding: 6px 10px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-radius: 999px;
+    }
+
+    .lead {
+      font-size: 17px;
+      color: #2b241f;
+      max-width: 48em;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 22px 0 8px;
+    }
+
+    .meta-card {
+      padding: 12px;
+      background: #fbf5ee;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+
+    .meta-card strong {
+      display: block;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .meta-card span {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .phase {
+      margin: 18px 0 0;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: linear-gradient(180deg, #fffdf9 0%, #f9f2ea 100%);
+    }
+
+    .phase-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+
+    .phase-number {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .phase-title {
+      font-size: 22px;
+      font-weight: 800;
+      margin: 2px 0 0;
+    }
+
+    .phase-goal {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 12px;
+    }
+
+    .card {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.78);
+    }
+
+    .card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--accent);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    ul, ol {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    li + li {
+      margin-top: 6px;
+    }
+
+    .checklist {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .checklist li::before {
+      content: "• ";
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .timeline-step {
+      padding: 10px;
+      background: #fbf5ee;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      font-size: 13px;
+    }
+
+    .timeline-step strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--accent);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+
+    th, td {
+      border: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      padding: 9px 10px;
+    }
+
+    th {
+      background: #fbf5ee;
+      color: var(--accent);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .warning {
+      margin-top: 12px;
+      padding: 12px;
+      border-left: 4px solid var(--accent);
+      background: #fcf4ea;
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      main {
+        width: auto;
+        margin: 0;
+        padding: 0;
+      }
+
+      .page {
+        border: 0;
+        box-shadow: none;
+        margin: 0;
+        padding: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="page">
+      <div class="eyebrow">Plan delivery do publicznego launchu</div>
+      <h1>RiffRush<br>Szczegolowy plan realizacji i wdrozenia</h1>
+      <p class="lead">
+        Dokument opisuje pelna droge od uporzadkowania zakresu produktu, przez budowe lokalnego
+        silnika audio i platformy webowej, az do bezpiecznego uruchomienia aplikacji dla pierwszych
+        uzytkownikow oraz przygotowania procesu dalszego skalowania.
+      </p>
+
+      <div class="meta">
+        <div class="meta-card">
+          <strong>Cel</strong>
+          <span>Doprowadzenie produktu do stabilnego launchu</span>
+        </div>
+        <div class="meta-card">
+          <strong>Zakres</strong>
+          <span>Web, backend, local engine, content, QA, ops</span>
+        </div>
+        <div class="meta-card">
+          <strong>Zasada glowna</strong>
+          <span>Engine jest zrodlem prawdy dla audio, czasu i scoringu</span>
+        </div>
+      </div>
+
+      <h2>Jak czytac ten plan</h2>
+      <p>
+        Kazdy etap zawiera: cel, konkretne prace do wykonania, artefakty koncowe oraz kryteria
+        zamkniecia. Etapy sa ulozone w kolejnosci realizacji. Nie nalezy rozpoczynac kolejnych
+        obszarow dopoki poprzedni nie daje dzialajacego i sprawdzalnego rezultatu.
+      </p>
+
+      <h2>Definicja konca projektu</h2>
+      <ul class="checklist">
+        <li>Uzytkownik moze zalozyc konto, przejsc onboarding i pobrac local engine.</li>
+        <li>Silnik lokalny uruchamia sie bezproblemowo, wykrywa audio i laczy sie z aplikacja webowa.</li>
+        <li>Trening dziala end to end: start sesji, odbior zdarzen, scoring, zapis wyniku, prezentacja progresu.</li>
+        <li>Produkt posiada monitoring, obsluge bledow, dokumentacje operacyjna i wsparcie po starcie.</li>
+        <li>Publiczny launch mozna przeprowadzic bez recznych interwencji na kazdej sesji uzytkownika.</li>
+      </ul>
+
+      <div class="timeline">
+        <div class="timeline-step">
+          <strong>Faza 1</strong>
+          Ustalenie scope i architektury
+        </div>
+        <div class="timeline-step">
+          <strong>Faza 2</strong>
+          Budowa dzialajacego rdzenia audio
+        </div>
+        <div class="timeline-step">
+          <strong>Faza 3</strong>
+          Integracja produktu i testy beta
+        </div>
+        <div class="timeline-step">
+          <strong>Faza 4</strong>
+          Gotowosc operacyjna i publiczny launch
+        </div>
+      </div>
+    </section>
+
+    <section class="page">
+      <div class="phase">
+        <div class="phase-head">
+          <div>
+            <div class="phase-number">Etap 01</div>
+            <div class="phase-title">Zamkniecie zakresu MVP</div>
+          </div>
+        </div>
+        <p class="phase-goal">
+          Celem jest decyzja, co dokladnie wchodzi do pierwszej wersji, a co pozostaje poza MVP.
+        </p>
+        <div class="grid">
+          <div class="card">
+            <strong>Prace do wykonania</strong>
+            <ul>
+              <li>Zdefiniowac 1 glowny typ treningu i 1 glowny flow sesji.</li>
+              <li>Ograniczyc engine do monofonii i podstawowego scoringu.</li>
+              <li>Spisac minimalny onboarding, dashboard i widok wyniku.</li>
+              <li>Zamknac liste platform startowych, na przyklad Windows jako pierwszy target.</li>
+              <li>Ustalic, czy platnosci sa w MVP czy dopiero po walidacji produktu.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <strong>Artefakty i kryteria wyjscia</strong>
+            <ul>
+              <li>Jednostronicowy scope MVP i lista rzeczy poza MVP.</li>
+              <li>Lista user stories krytycznych dla pierwszej wersji.</li>
+              <li>Decyzja produktowa: co znaczy "dziala" dla pierwszej sesji treningowej.</li>
+              <li>Brak otwartych sporow o funkcje, ktore zatrzymuja implementacje.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head">
+          <div>
+            <div class="phase-number">Etap 02</div>
+            <div class="phase-title">Uszczegolowienie architektury systemu</div>
+          </div>
+        </div>
+        <p class="phase-goal">
+          Przelozenie wysokopoziomowych zalozen na konkretna architekture aplikacji, repozytoriow i interfejsow.
+        </p>
+        <div class="grid">
+          <div class="card">
+            <strong>Prace do wykonania</strong>
+            <ul>
+              <li>Rozpisac granice odpowiedzialnosci: web, backend, local engine, content pipeline.</li>
+              <li>Zamknac protokol WebSocket: handshake, wersjonowanie, heartbeat, eventy sesji.</li>
+              <li>Okreslic model danych: uzytkownik, trening, sesja, wynik, streak, postep.</li>
+              <li>Wybrac stos technologiczny dla kazdej warstwy i ustalic standardy kodu.</li>
+              <li>Zdecydowac o strukturze CI, release flow i srodowiskach.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <strong>Artefakty i kryteria wyjscia</strong>
+            <ul>
+              <li>Diagram architektury systemu i przeplywu danych.</li>
+              <li>Specyfikacja komunikatow engine-web gotowa do implementacji.</li>
+              <li>Model danych oraz lista endpointow backendu.</li>
+              <li>Brak niejednoznacznosci, kto liczy scoring i kto przechowuje wyniki.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head">
+          <div>
+            <div class="phase-number">Etap 03</div>
+            <div class="phase-title">Przygotowanie repozytorium i infrastruktury developerskiej</div>
+          </div>
+        </div>
+        <p class="phase-goal">
+          Zbudowanie solidnej bazy pracy, zeby kolejne etapy byly powtarzalne i kontrolowalne.
+        </p>
+        <div class="grid">
+          <div class="card">
+            <strong>Prace do wykonania</strong>
+            <ul>
+              <li>Utworzyc repo albo monorepo z podzialem na web, backend, engine i shared contracts.</li>
+              <li>Skonfigurowac linting, formatowanie, pre-commit hooks i podstawowe testy.</li>
+              <li>Postawic CI dla buildow, testow i artefaktow release.</li>
+              <li>Dodac mechanizm wersjonowania kontraktow i release notes.</li>
+              <li>Spisac README techniczne i sposob uruchamiania lokalnego.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <strong>Artefakty i kryteria wyjscia</strong>
+            <ul>
+              <li>Nowy developer jest w stanie uruchomic srodowisko bez zgadywania.</li>
+              <li>Push do glownej galezi uruchamia testy i buildy.</li>
+              <li>Istnieje minimum jedna powtarzalna komenda release dla web i engine.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page">
+      <div class="phase">
+        <div class="phase-head">
+          <div>
+            <div class="phase-number">Etap 04</div>
+            <div class="phase-title">Implementacja podstaw local engine</div>
+          </div>
+        </div>
+        <p class="phase-goal">
+          Zbudowac dzialajacy proces lokalny, ktory potrafi czytac audio i komunikowac sie z webem.
+        </p>
+        <div class="grid">
+          <div class="card">
+            <strong>Prace do wykonania</strong>
+            <ul>
+              <li>Stworzyc proces natywny z obsluga urzadzen audio, konfiguracji i lifecycle.</li>
+              <li>Wdrozyc audio thread, processing thread i network thread.</li>
+              <li>Dodac lock-free buffer, timestampowanie i podstawowe eventy sesyjne.</li>
+              <li>Uruchomic lokalny serwer WebSocket z handshake i heartbeat.</li>
+              <li>Przygotowac logowanie diagnostyczne poza audio threadem.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <strong>Artefakty i kryteria wyjscia</strong>
+            <ul>
+              <li>Engine uruchamia sie lokalnie i jest wykrywany przez aplikacje webowa.</li>
+              <li>Silnik raportuje stan urzadzenia, wersje i gotowosc do sesji.</li>
+              <li>Brak blokowania watku audio przy zwyklym obciazeniu.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head">
+          <div>
+            <div class="phase-number">Etap 05</div>
+            <div class="phase-title">Implementacja algorytmow audio i scoringu MVP</div>
+          </div>
+        </div>
+        <p class="phase-goal">
+          Zamknac najwazniejsza wartosc produktu: rozpoznanie zagrania i uczciwy feedback w czasie zblizonym do rzeczywistego.
+        </p>
+        <div class="grid">
+          <div class="card">
+            <strong>Prace do wykonania</strong>
+            <ul>
+              <li>Dodac preprocessing: high-pass, noise gate, podstawowa normalizacja.</li>
+              <li>Wdrozyc onset detection dla rozpoczecia dzwieku.</li>
+              <li>Wdrozyc pitch detection dla pojedynczej nuty.</li>
+              <li>Zaprojektowac prosty model scoringu: timing, poprawna nuta, pewnosc detekcji.</li>
+              <li>Dodac kalibracje opoznienia i zapis parametrow per uzytkownik lub urzadzenie.</li>
+              <li>Zbudowac zestaw probek testowych i benchmark dokladnosci.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <strong>Artefakty i kryteria wyjscia</strong>
+            <ul>
+              <li>Silnik zwraca eventy z nuta, timestampem i ocena trafienia.</li>
+              <li>Scoring jest deterministyczny dla tych samych danych wejsciowych.</li>
+              <li>Istnieja testy regresji dla sygnalow audio i znanych przypadkow granicznych.</li>
+              <li>Dokladnosc i latencja sa wystarczajace do testow z realnymi gitarzystami.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head">
+          <div>
+            <div class="phase-number">Etap 06</div>
+            <div class="phase-title">Warstwa backendu i danych</div>
+          </div>
+        </div>
+        <p class="phase-goal">
+          Zapewnic trwale dane produktu, autoryzacje i zapis wszystkiego, co potrzebne do progresu i analityki.
+        </p>
+        <div class="grid">
+          <div class="card">
+            <strong>Prace do wykonania</strong>
+            <ul>
+              <li>Postawic baze danych i migracje.</li>
+              <li>Wdrozyc auth, sesje i podstawowe profile uzytkownika.</li>
+              <li>Dodac modele: training program, lesson, attempt, score summary, streak, achievements.</li>
+              <li>Przygotowac API dla pobierania treningow, zapisu wynikow i dashboardu.</li>
+              <li>Dodac audyt bledow, rate limiting i walidacje payloadow.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <strong>Artefakty i kryteria wyjscia</strong>
+            <ul>
+              <li>Pelna sesja treningowa zapisuje wynik i jest widoczna po odswiezeniu.</li>
+              <li>Dane sa spójne miedzy webem a backendem.</li>
+              <li>Istnieje plan backupu i odtworzenia srodowiska.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page">
+      <div class="phase">
+        <div class="phase-head">
+          <div>
+            <div class="phase-number">Etap 07</div>
+            <div class="phase-title">Frontend aplikacji webowej</div>
+          </div>
+        </div>
+        <p class="phase-goal">
+          Zbudowac warstwe, ktora prowadzi uzytkownika od wejscia do produktu do zakonczenia pierwszej sesji.
+        </p>
+        <div class="grid">
+          <div class="card">
+            <strong>Prace do wykonania</strong>
+            <ul>
+              <li>Zaprojektowac landing, logowanie, onboarding, dashboard i ekran treningu.</li>
+              <li>Dodac wykrywanie local engine, status polaczenia i instrukcje dla uzytkownika.</li>
+              <li>Przygotowac widok kalibracji oraz test urzadzenia audio.</li>
+              <li>Pokazac scoring na zywo i ekran podsumowania sesji.</li>
+              <li>Dodac stany bledow: brak engine, brak mikrofonu, niekompatybilna wersja, utrata polaczenia.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <strong>Artefakty i kryteria wyjscia</strong>
+            <ul>
+              <li>Nowy uzytkownik przechodzi przez flow bez pomocy developera.</li>
+              <li>Interfejs jasno komunikuje co trzeba zrobic, gdy lokalny silnik nie dziala.</li>
+              <li>UI nie blokuje sesji i nie przejmuje odpowiedzialnosci za scoring.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head">
+          <div>
+            <div class="phase-number">Etap 08</div>
+            <div class="phase-title">Content, ekonomia produktu i mechaniki progresu</div>
+          </div>
+        </div>
+        <p class="phase-goal">
+          Zrobic z technologii produkt, do ktorego chce sie wracac codziennie, a nie tylko demonstracje audio.
+        </p>
+        <div class="grid">
+          <div class="card">
+            <strong>Prace do wykonania</strong>
+            <ul>
+              <li>Stworzyc pierwszy katalog treningow i sciezek rozwoju.</li>
+              <li>Okreslic zasady zdobywania punktow, streakow, poziomow i nagrod.</li>
+              <li>Przygotowac copy onboardingowe i komunikaty motywacyjne.</li>
+              <li>Jesli platnosci sa w MVP, zdefiniowac plany, limity i paywall.</li>
+              <li>Zaprojektowac panel administracyjny lub format danych do dodawania nowych treningow.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <strong>Artefakty i kryteria wyjscia</strong>
+            <ul>
+              <li>Produkt ma zawartosc wystarczajaca na pierwsze tygodnie testow.</li>
+              <li>Mechanika progresu wspiera codzienny nawyk, a nie tylko pojedynczy wynik.</li>
+              <li>Dodanie nowego treningu nie wymaga zmian w kodzie engine.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head">
+          <div>
+            <div class="phase-number">Etap 09</div>
+            <div class="phase-title">Packaging, aktualizacje i dystrybucja local engine</div>
+          </div>
+        </div>
+        <p class="phase-goal">
+          Doprowadzic silnik lokalny do postaci produktu, ktory mozna bezpiecznie rozdawac i aktualizowac.
+        </p>
+        <div class="grid">
+          <div class="card">
+            <strong>Prace do wykonania</strong>
+            <ul>
+              <li>Stworzyc instalator, podpisywanie binarek i mechanizm auto-update lub update prompt.</li>
+              <li>Dodac zgodne wersjonowanie z aplikacja webowa oraz wymuszanie kompatybilnosci protokolu.</li>
+              <li>Przygotowac telemetrie awarii startu i problemow z audio device.</li>
+              <li>Opracowac strone pobierania, instrukcje instalacji i FAQ.</li>
+              <li>Przetestowac upgrade z jednej wersji engine do kolejnej bez utraty ustawien.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <strong>Artefakty i kryteria wyjscia</strong>
+            <ul>
+              <li>Istnieje stabilny pakiet instalacyjny dla pierwszej wspieranej platformy.</li>
+              <li>Proces aktualizacji nie rozbija sesji i nie miesza wersji protokolu.</li>
+              <li>Zespol zna najczestsze problemy instalacyjne i ma gotowe odpowiedzi.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page">
+      <div class="phase">
+        <div class="phase-head">
+          <div>
+            <div class="phase-number">Etap 10</div>
+            <div class="phase-title">Jakosc, testy systemowe i hardening</div>
+          </div>
+        </div>
+        <p class="phase-goal">
+          Usunac problemy, ktore w zamknietym zespole wydaja sie male, ale po launchu natychmiast zabijaja adopcje.
+        </p>
+        <div class="grid">
+          <div class="card">
+            <strong>Prace do wykonania</strong>
+            <ul>
+              <li>Uruchomic testy jednostkowe, integracyjne i end-to-end dla kluczowych flow.</li>
+              <li>Przygotowac test matrix: system operacyjny, karty audio, mikrofony, interfejsy, przegladarki.</li>
+              <li>Zweryfikowac zachowanie przy slabych warunkach: brak dostepu do mikrofonu, duza latencja, zerwanie polaczenia.</li>
+              <li>Zbadac obciazenie backendu, limity websocketow i logike sesji rownoleglych.</li>
+              <li>Wprowadzic checklisty release, smoke tests i rollback plan.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <strong>Artefakty i kryteria wyjscia</strong>
+            <ul>
+              <li>Krytyczne scenariusze maja automatyczne pokrycie albo jawna procedure manualna.</li>
+              <li>Lista znanych bledow jest zamknieta i posegregowana na blocker, major, minor.</li>
+              <li>Nie ma otwartych blockerow dla onboardingu, sesji treningowej i zapisu wyniku.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head">
+          <div>
+            <div class="phase-number">Etap 11</div>
+            <div class="phase-title">Beta zamknieta i walidacja z uzytkownikami</div>
+          </div>
+        </div>
+        <p class="phase-goal">
+          Sprawdzic, czy produkt dziala poza zespolem i czy ludzie faktycznie rozumieja jego wartosc.
+        </p>
+        <div class="grid">
+          <div class="card">
+            <strong>Prace do wykonania</strong>
+            <ul>
+              <li>Zrekrutowac pierwsza grupe beta testerow o roznym poziomie gry i sprzecie.</li>
+              <li>Przygotowac scenariusz testowy: instalacja, pierwsza sesja, druga sesja po 24 godzinach, feedback.</li>
+              <li>Zbierac dane ilosciowe: aktywacja, procent ukonczonych onboardingow, liczba sesji, czas do pierwszego sukcesu.</li>
+              <li>Zbierac dane jakosciowe: gdzie uzytkownicy sie gubia, kiedy przestaja ufac scoringowi, co ich motywuje.</li>
+              <li>Regularnie zamykac petle poprawek w krotkich iteracjach.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <strong>Artefakty i kryteria wyjscia</strong>
+            <ul>
+              <li>Istnieje raport z beta testow z lista decyzji produktowych i technicznych.</li>
+              <li>Wiadomo, co psuje retencje i co trzeba poprawic przed publicznym startem.</li>
+              <li>Minimum kilkunastu uzytkownikow dochodzi do zakonczonej sesji bez wsparcia 1:1.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head">
+          <div>
+            <div class="phase-number">Etap 12</div>
+            <div class="phase-title">Operacje, support i gotowosc do launchu</div>
+          </div>
+        </div>
+        <p class="phase-goal">
+          Przygotowac zespol i systemy na moment, w ktorym liczba problemow rosnie razem z ruchem.
+        </p>
+        <div class="grid">
+          <div class="card">
+            <strong>Prace do wykonania</strong>
+            <ul>
+              <li>Skonfigurowac monitoring aplikacji, backendu, engine i procesu instalacji.</li>
+              <li>Dodac alerty dla spadku aktywacji, wzrostu crashy i awarii websocketow.</li>
+              <li>Stworzyc panel supportowy albo minimum procedures do analizy zgłoszen.</li>
+              <li>Przygotowac polityke prywatnosci, regulamin, zgody i komunikaty prawne.</li>
+              <li>Spisac runbook incydentowy i plan komunikacji z uzytkownikami przy awarii.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <strong>Artefakty i kryteria wyjscia</strong>
+            <ul>
+              <li>Zespol wie kto reaguje na konkretny typ awarii.</li>
+              <li>Metryki sukcesu launchu sa zdefiniowane i widoczne w dashboardach.</li>
+              <li>Istnieje gotowy plan rollbacku i czas reakcji na incydent.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page">
+      <div class="phase">
+        <div class="phase-head">
+          <div>
+            <div class="phase-number">Etap 13</div>
+            <div class="phase-title">Soft launch</div>
+          </div>
+        </div>
+        <p class="phase-goal">
+          Wypuscic produkt do ograniczonej grupy publicznej, zanim ruch i oczekiwania stana sie zbyt duze.
+        </p>
+        <div class="grid">
+          <div class="card">
+            <strong>Prace do wykonania</strong>
+            <ul>
+              <li>Uruchomic ograniczona rejestracje lub liste oczekujacych.</li>
+              <li>Wlaczyc kampanie testowe tylko na tyle, ile zespol umie obsluzyc.</li>
+              <li>Codziennie przegladac wskazniki aktywacji, retencji i crashy.</li>
+              <li>Priorytetyzowac poprawki blokujace i wprowadzac male, szybkie releasy.</li>
+              <li>Weryfikowac, czy support nadaza i czy instalacja nie jest glowna bariera.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <strong>Artefakty i kryteria wyjscia</strong>
+            <ul>
+              <li>Produkt utrzymuje stabilnosc przy realnym ruchu.</li>
+              <li>Kluczowe wskazniki nie pogarszaja sie po zwiekszeniu liczby uzytkownikow.</li>
+              <li>Nie ma nowych blockerow, ktorych nie widac bylo w becie.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head">
+          <div>
+            <div class="phase-number">Etap 14</div>
+            <div class="phase-title">Publiczny launch i pierwsze 30 dni po starcie</div>
+          </div>
+        </div>
+        <p class="phase-goal">
+          Wypuscic produkt szeroko, nie tracac kontroli nad jakoscia, supportem i rytmem poprawek.
+        </p>
+        <div class="grid">
+          <div class="card">
+            <strong>Prace do wykonania</strong>
+            <ul>
+              <li>Odblokowac publiczna rejestracje, komunikacje marketingowa i publikacje launchowe.</li>
+              <li>Monitorowac launch hour by hour, potem daily.</li>
+              <li>Zamykac incydenty i publikowac poprawki w stalej kadencji.</li>
+              <li>Uruchomic proces zbierania roadmapy po starcie na podstawie danych, a nie przeczuc.</li>
+              <li>Po 30 dniach zrobic review: techniczne, produktowe i finansowe.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <strong>Artefakty i kryteria wyjscia</strong>
+            <ul>
+              <li>Launch jest zakonczony bez awarii krytycznej lub ma opanowany plan naprawczy.</li>
+              <li>Istnieje lista najwazniejszych zmian do wersji 1.1 i 1.2.</li>
+              <li>Zespol ma jasnosc, czy produkt przechodzi z fazy walidacji do fazy wzrostu.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <h2>Przekrojowe obszary, ktore musza byc robione przez caly projekt</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Obszar</th>
+            <th>Co robic stale</th>
+            <th>Po czym poznac, ze jest zaniedbany</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Bezpieczenstwo</td>
+            <td>Walidacja wejsc, zarzadzanie sekretami, aktualizacje zaleznosci, ograniczanie uprawnien.</td>
+            <td>Losowe awarie auth, podatnosc na naduzycia, brak pewnosci co trafia do logow.</td>
+          </tr>
+          <tr>
+            <td>Observability</td>
+            <td>Logi, tracing, metryki, crash reports, dashboardy per warstwa.</td>
+            <td>Problemy zgłaszane przez uzytkownikow sa nieodtwarzalne.</td>
+          </tr>
+          <tr>
+            <td>Jakosc produktu</td>
+            <td>Regularne przeglady UX, smoke testy i porzadkowanie backlogu.</td>
+            <td>Zespol poprawia przypadkowe szczegoly zamiast przyczyn porzucania produktu.</td>
+          </tr>
+          <tr>
+            <td>Dokumentacja</td>
+            <td>Aktualizacja kontraktow, setupu, procedur release i supportu.</td>
+            <td>Nowe osoby potrzebuja ustnych wyjasnien do kazdego kroku.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="warning">
+        <strong>Najwazniejsza zasada wykonawcza:</strong>
+        jesli trzeba wybierac miedzy "ladniejszym UI" a "stabilnym timingiem, scoringiem i komunikacja engine-web",
+        zawsze wygrywa rdzen. Bez zaufanego feedbacku audio cala reszta produktu traci sens.
+      </div>
+
+      <p class="small" style="margin-top: 18px;">
+        Dokument przygotowany jako szczegolowy plan realizacji i wdrozenia dla projektu RiffRush.
+      </p>
+    </section>
+  </main>
+</body>
+</html>

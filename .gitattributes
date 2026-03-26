@@ -1,0 +1,14 @@
+# Normalize line endings to LF in the repository; let Git convert on checkout.
+* text=auto eol=lf
+
+# Ensure shell scripts are always LF even on Windows.
+*.sh text eol=lf
+
+# Binaries — never transform.
+*.sqlite binary
+*.wav    binary
+*.exe    binary
+*.pkg    binary
+*.png    binary
+*.jpg    binary
+*.ico    binary

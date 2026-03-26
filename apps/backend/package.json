@@ -1,0 +1,12 @@
+{
+  "name": "@riffrush/backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node ./src/server.js",
+    "smoke": "node ./scripts/smoke-test.js",
+    "smoke:auth": "node ./scripts/auth-smoke-test.js",
+    "smoke:persistence": "node ./scripts/persistence-smoke-test.js"
+  }
+}

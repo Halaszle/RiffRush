@@ -1,0 +1,16 @@
+{
+  "name": "@riffrush/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:static": "node ./scripts/static-server.js",
+    "build": "vite build",
+    "preview": "vite preview",
+    "smoke": "node ./scripts/smoke-test.js"
+  },
+  "devDependencies": {
+    "vite": "^6.0.0"
+  }
+}

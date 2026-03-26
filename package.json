@@ -1,0 +1,32 @@
+{
+  "name": "riffrush",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "check:protocol": "node ./packages/protocol/scripts/validate-protocol.js",
+    "dev:backend": "node ./apps/backend/src/server.js",
+    "seed:admin": "node ./apps/backend/scripts/seed-admin.js",
+    "smoke:backend": "node ./apps/backend/scripts/smoke-test.js",
+    "smoke:auth": "node ./apps/backend/scripts/auth-smoke-test.js",
+    "dev:web": "npm run dev --workspace=apps/web",
+    "dev:web:static": "node ./apps/web/scripts/static-server.js",
+    "build:web": "npm run build --workspace=apps/web",
+    "smoke:web": "node ./apps/web/scripts/smoke-test.js",
+    "dev:engine": "node ./apps/engine/src/server.js",
+    "smoke:engine": "node ./apps/engine/scripts/smoke-test.js",
+    "smoke:vertical": "node ./scripts/vertical-slice-smoke.js",
+    "test:engine-audio": "node ./apps/engine/scripts/audio-pipeline-test.js",
+    "generate:demo-wav": "node ./apps/engine/scripts/generate-demo-wav.js",
+    "smoke:engine-live": "node ./apps/engine/scripts/live-stream-smoke-test.js",
+    "smoke:engine-native": "node ./apps/engine/scripts/native-capture-smoke-test.js",
+    "build:native-capture": "dotnet build ./apps/native-capture-bridge/native-capture-bridge.csproj",
+    "list:native-devices": "dotnet run --project ./apps/native-capture-bridge -- --list-devices",
+    "build:engine-exe": "node ./apps/engine/scripts/build-exe.js",
+    "build:engine-exe:full": "node ./apps/engine/scripts/build-exe.js --full"
+  }
+}

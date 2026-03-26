@@ -1,0 +1,41 @@
+## Dependencies
+node_modules/
+
+## Build output
+dist/
+build/
+
+## Backend runtime data (SQLite database, WAL files)
+apps/backend/storage/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+
+## Engine packaged executables
+apps/engine/*.exe
+apps/engine/*.pkg
+
+## Next.js / Turbo (reserved for future)
+.next/
+.turbo/
+coverage/
+
+## C# build artifacts
+target/
+bin/
+obj/
+
+## Environment / secrets
+.env
+.env.*
+!.env.example
+
+## Temporary test files
+tmp/
+riffrush-vertical-*/
+
+## Editor / OS artifacts
+.DS_Store
+Thumbs.db
+.vscode/settings.json
+.chrome-pdf/
