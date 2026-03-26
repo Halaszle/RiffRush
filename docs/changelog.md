@@ -4,6 +4,102 @@ Format: `[data] Krótki opis zmiany — pliki których dotyczy`
 
 ---
 
+## 2026-03-26 (8)
+
+### Gameplay UI — 6-strunowa autostrada nut (multi-lane highway)
+
+**Problem:**
+Poprzedni ekran gry miał jeden poziomy pas z nutami opatrzonymi etykietą "str X". Gracz nie wiedział intuicyjnie, co i na której strunie zagrać — UI nie przypominało gitarowego neck view ani tabulatury.
+
+**Rozwiązanie:**
+Autostrada nut podzielona na 6 torów — po jednym na każdą strunę gitary (1 = wysokie e, 6 = niskie E). Każda struna ma własny kolor (zgodny z konwencją Rock Band / Rocksmith), a nuty umieszczane są dokładnie w torze odpowiadającym ich strunie. Etykiety strun (e, B, G, D, A, E) widoczne jako stała kolumna po lewej stronie.
+
+**Zmiany wizualne:**
+
+| Poprzednio | Teraz |
+|---|---|
+| Jeden pas, wys. 88 px | 6 torów, wys. 216 px (6 × 36 px) |
+| Nuty wyśrodkowane pionowo | Nuty w torze swojej struny |
+| Etykieta "str X" na każdej nucie | Kolor i pozycja toru wystarczą |
+| Jednolity kolor (pomarańczowy) | Struna 1: żółty · 2: fiolet · 3: cyjan · 4: zielony · 5: pomarańcz · 6: czerwony |
+
+**Szczegóły implementacji:**
+
+Kolory strun zdefiniowane przez CSS custom property `--s-hue` — jedno źródło prawdy dla toru i nuty:
+```
+String 1 (e) → hue 52  (żółty)
+String 2 (B) → hue 280 (fiolet)
+String 3 (G) → hue 195 (cyjan)
+String 4 (D) → hue 130 (zielony)
+String 5 (A) → hue 22  (pomarańczowy)
+String 6 (E) → hue 0   (czerwony)
+```
+
+- `apps/web/public/index.html` — dodano `.gameplay-string-labels` (6 divów z nazwami strun) i `.gameplay-lane-track` (6 divów tła torów) wewnątrz `#gameplay-highway`
+- `apps/web/public/styles.css` — `gameplay-highway-wrap` zmieniony na flex; nowe reguły: `.gameplay-string-labels`, `.gameplay-string-label`, `.gameplay-lane-track`, `.gameplay-lane`; `.gameplay-note` — usunięto `top: 50% / translateY`, dodano dziedziczenie `--s-hue`; `is-hit` — zielony glow; `is-miss` — wygaszony czerwony
+- `apps/web/public/app.js` — nowe stałe: `LANE_HEIGHT_PX = 36`, `NOTE_LANE_PADDING_PX = 3`, `STRING_NAMES`, `STRING_HUES`; `createNoteElement` — `top` / `height` obliczane z `stringNumber`, `--s-hue` ustawiane inline przez `setProperty`, usunięty element "str X"
+
+**Testy:** `smoke:web` (pass), `smoke:backend` (pass), `smoke:vertical` (pass), `build:web` (340 ms, 42 kB gzip)
+
+---
+
+## 2026-03-26 (7)
+
+### CI/CD, git init, admin seed — infrastruktura deweloperska
+
+**Konto admina do testowania:**
+
+| Pole | Wartość |
+|------|---------|
+| Email | `admin@riffrush.local` |
+| Hasło | `admin` |
+
+```bash
+npm run seed:admin   # tworzy konto w lokalnej bazie; bezpieczny re-run (idempotent)
+```
+
+Hasło "admin" ma 5 znaków (mniej niż minimalne 8 dla nowych kont), ale `AuthService.login()` nie sprawdza długości przy logowaniu — seed działa bezpośrednio przez `SqliteUserRepository.createWithCredentials` + `hashPassword` (scrypt), pomijając walidację rejestracji.
+
+**CI/CD — GitHub Actions:**
+
+Workflow `.github/workflows/ci.yml` uruchamia się przy każdym push i pull request:
+
+```
+Job: smoke-tests (ubuntu-latest)
+  → actions/checkout@v4
+  → actions/setup-node@v4 (Node 22 + npm cache)
+  → npm ci
+  → smoke:backend
+  → smoke:auth
+  → smoke:web
+  → smoke:vertical
+
+Job: build-web (depends on smoke-tests)
+  → vite build
+  → upload-artifact apps/web/dist/ (retention: 7 dni)
+```
+
+Wszystkie smoke testy działają na portach efemerycznych (port 0) — żadnych wymagań infrastrukturalnych na CI.
+
+**Git — initial commit:**
+- `git init` w katalogu projektu
+- `.gitignore` — zaktualizowany o `apps/backend/storage/`, `*.sqlite*`, `apps/engine/*.exe`, `riffrush-vertical-*/`
+- `.gitattributes` — `* text=auto eol=lf` eliminuje ostrzeżenia CRLF na Windows
+- Initial commit: 92 pliki, 39 653 linii
+
+**Nowe pliki:**
+- `apps/backend/scripts/seed-admin.js` — seed konta admin
+- `.github/workflows/ci.yml` — GitHub Actions CI pipeline
+- `.gitattributes` — normalizacja końców linii
+
+**Zmodyfikowane pliki:**
+- `package.json` (root) — dodano `seed:admin`
+- `.gitignore` — rozszerzono o wpisy specyficzne dla projektu
+
+**Testy:** `smoke:backend` (pass), `smoke:auth` (pass), `smoke:web` (pass), `smoke:vertical` (pass)
+
+---
+
 ## 2026-03-26 (6)
 
 ### Build system frontendu — Vite 6 bundler i minifikacja produkcyjna

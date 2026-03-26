@@ -112,7 +112,27 @@
         <div id="gameplay-feedback" class="gameplay-feedback" hidden></div>
 
         <div class="gameplay-highway-wrap">
+          <!-- Static string labels — one row per guitar string (1 = high e, 6 = low E) -->
+          <div class="gameplay-string-labels" aria-hidden="true">
+            <div class="gameplay-string-label" data-string="1">e</div>
+            <div class="gameplay-string-label" data-string="2">B</div>
+            <div class="gameplay-string-label" data-string="3">G</div>
+            <div class="gameplay-string-label" data-string="4">D</div>
+            <div class="gameplay-string-label" data-string="5">A</div>
+            <div class="gameplay-string-label" data-string="6">E</div>
+          </div>
+
           <div id="gameplay-highway" class="gameplay-highway">
+            <!-- Static lane backgrounds — one per string -->
+            <div class="gameplay-lane-track" aria-hidden="true">
+              <div class="gameplay-lane" data-string="1"></div>
+              <div class="gameplay-lane" data-string="2"></div>
+              <div class="gameplay-lane" data-string="3"></div>
+              <div class="gameplay-lane" data-string="4"></div>
+              <div class="gameplay-lane" data-string="5"></div>
+              <div class="gameplay-lane" data-string="6"></div>
+            </div>
+
             <div class="gameplay-playhead"></div>
             <div id="gameplay-notes" class="gameplay-notes"></div>
           </div>

@@ -4611,10 +4611,25 @@ function switchAuthTab(tab) {
 // Gameplay
 // ---------------------------------------------------------------------------
 
-const HIGHWAY_VISIBLE_MS = 4000;  // how many ms of notes are visible at once
-const HIGHWAY_PLAYHEAD_RATIO = 0.25; // playhead at 25% from left
-const NOTE_MIN_WIDTH_PX = 56;
-const NOTE_PADDING_PX = 4;
+const HIGHWAY_VISIBLE_MS = 4000;    // how many ms of notes are visible at once
+const HIGHWAY_PLAYHEAD_RATIO = 0.25; // playhead sits at 25% from left edge
+const NOTE_MIN_WIDTH_PX = 52;        // minimum note width in pixels
+const NOTE_PADDING_PX = 4;           // horizontal gap between adjacent notes
+
+// Multi-lane highway constants — must match the CSS values.
+const LANE_HEIGHT_PX = 36; // height of one string lane in pixels (6 lanes × 36 = 216 px highway)
+const NOTE_LANE_PADDING_PX = 3; // vertical inset of a note within its lane
+
+/** Standard guitar string names, indexed 1 (high e) → 6 (low E). */
+const STRING_NAMES = { 1: "e", 2: "B", 3: "G", 4: "D", 5: "A", 6: "E" };
+
+/**
+ * HSL hue for each guitar string.
+ * Applied as CSS custom property --s-hue so the note inherits its lane colour.
+ *   1 = high e (yellow), 2 = B (purple), 3 = G (cyan)
+ *   4 = D (green), 5 = A (orange), 6 = low E (red)
+ */
+const STRING_HUES = { 1: 52, 2: 280, 3: 195, 4: 130, 5: 22, 6: 0 };
 
 /**
  * Builds an array of timed targets from training data.
@@ -4679,28 +4694,34 @@ function buildGameplayTargets(training, tempoBpm, practiceScope, loopSectionId, 
   return { targets, leadInMs, beatDurationMs };
 }
 
-/** Creates a DOM element for one highway note. */
+/** Creates a DOM element for one highway note, positioned in its string lane. */
 function createNoteElement(target, highwayWidth, pxPerMs) {
   const el = document.createElement("div");
   el.className = "gameplay-note";
+  el.dataset.string = target.stringNumber;
 
+  // Apply the string colour as a CSS custom property so the note inherits
+  // the same hue as its lane without duplicating colour definitions.
+  const hue = STRING_HUES[target.stringNumber] ?? 25;
+  el.style.setProperty("--s-hue", hue);
+
+  // Horizontal extent — grows proportionally with note duration.
   const noteWidth = Math.max(NOTE_MIN_WIDTH_PX, Math.round(target.durationMs * pxPerMs) - NOTE_PADDING_PX);
   el.style.width = `${noteWidth}px`;
 
-  // Initial left position (will be overridden by container translate each frame)
-  const noteLeft = Math.round(target.expectedTimeMs * pxPerMs);
-  el.style.left = `${noteLeft}px`;
+  // Horizontal start position (the notes container is translated each frame).
+  el.style.left = `${Math.round(target.expectedTimeMs * pxPerMs)}px`;
+
+  // Vertical position: place the note within its string lane.
+  const laneTop = (target.stringNumber - 1) * LANE_HEIGHT_PX;
+  el.style.top = `${laneTop + NOTE_LANE_PADDING_PX}px`;
+  el.style.height = `${LANE_HEIGHT_PX - NOTE_LANE_PADDING_PX * 2}px`;
 
   const pitch = document.createElement("span");
   pitch.className = "gameplay-note-pitch";
   pitch.textContent = target.note;
 
-  const string = document.createElement("span");
-  string.className = "gameplay-note-string";
-  string.textContent = `str ${target.stringNumber}`;
-
   el.appendChild(pitch);
-  el.appendChild(string);
   return el;
 }
 
